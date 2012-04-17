@@ -1,0 +1,126 @@
+#!/usr/bin/env node
+var api = require('../lib/apiutil.js');
+var exec = require('child_process').exec;
+
+var type = null;
+if ( process.argv[2] ) type = process.argv[2];
+
+var callback = function(ecnt, total, allMachineCnt, totalUsed, totalMem, bookedMem, cnt){
+	if(ecnt >= total){
+		console.log('Live Machine:%s, All Machine:%s, Query Date:%s', 
+					total, allMachineCnt, new Date().toString());
+	
+		var total = 0;
+	    var tMem = 0;
+		var bMem = 0;
+	    for(var i = 0 ; i < totalUsed.length ; i++ ){
+		    total += Number(totalUsed[i]);
+	        tMem += Number(totalMem[i]);
+	    }
+		for(var i = 0 ; i < bookedMem.length ; i++ ){
+			bMem += Number(bookedMem[i]);
+		}
+	    console.log('Total Used: %s, Total Mem: %s, Booked Mem: %s, CNT: %s', total, tMem, bMem, cnt);
+	}
+};
+
+switch(type){
+
+case '-a': //show all, include each machine's detail 
+	getTotalMemSum('m', callback);
+break;
+
+case '--rate':
+	getTotalMemSum(function(ecnt, total, allMachineCnt, totalUsed, totalMem, bookedMem, cnt){
+		if(ecnt >= total){
+			var total = 0;
+		    var tMem = 0;
+		    for(var i = 0 ; i < totalUsed.length ; i++ ){
+			    total += Number(totalUsed[i]);
+		        tMem += Number(totalMem[i]);
+		    }
+		    console.log(total/tMem);
+		}
+	});
+break;
+
+case '--createMachine':
+	var THRESHOLD = 0.5;
+	if( process.argv[3] != null ) {
+		 THRESHOLD = process.argv[3];
+	}
+	getTotalMemSum(function(ecnt, total, allMachineCnt, totalUsed, totalMem, bookedMem, cnt){
+		if(ecnt >= total){
+			var total = 0;
+		    var tMem = 0;
+		    for(var i = 0 ; i < totalUsed.length ; i++ ){
+			    total += Number(totalUsed[i]);
+		        tMem += Number(totalMem[i]);
+		    }
+		    var rate = (total/tMem);
+		    if(rate > THRESHOLD) {
+		    	console.log('Current rate:%s is over the setting (THRESHOLD=%s)', rate, THRESHOLD);
+		    	console.log('start to create machine...');
+		    	var cmd = 'bash -x ~/script/bin/createMachine.sh';
+				//console.log('exec:' + cmd);
+				exec(cmd, function(error, stdout, stderr) { 
+					//sys.puts(stdout) 
+					console.log(stdout);
+				});
+		    } else {
+		    	console.log('Current rate us %s. Still inside threshold(%s)', rate, THRESHOLD );
+		    }
+		}
+	});
+break;
+
+case '--zxtm':
+	api.createZxtmPool();
+break;
+
+case '--test': //show all, include each machine's detail 
+	api.getMachineMemoryState('s',function(ecnt, total, allMachineCnt, totalUsed, totalMem, bookedMem, cnt, machineList){
+		//if(ecnt >= total){
+			console.log('>>>>>' + JSON.stringify(machineList) + '<<<<<');
+			console.log('Live Machine:%s, All Machine:%s, Query Date:%s', 
+						total, allMachineCnt, new Date().toString());
+		
+			var total = 0;
+		    var tMem = 0;
+			var bMem = 0;
+		    for(var i = 0 ; i < totalUsed.length ; i++ ){
+			    total += Number(totalUsed[i]);
+		        tMem += Number(totalMem[i]);
+		    }
+			for(var i = 0 ; i < bookedMem.length ; i++ ){
+				bMem += Number(bookedMem[i]);
+			}
+		    console.log('Total Used: %s, Total Mem: %s, Booked Mem: %s, CNT: %s', total, tMem, bMem, cnt);
+		//}
+	});
+break;
+
+case '--cc': //show all, include each machine's detail
+	api.createMachine();
+break;
+
+case '--dd': //show all, include each machine's detail
+	api.deleteMachine(process.argv[3]);
+break;
+
+default:
+	/**
+	 * List the all smart machine and check all memory size
+	 */
+	getTotalMemSum(callback);
+break;
+}
+
+function getTotalMemSum(_first, _second){
+	//console.log('arguments.length=====>'+ arguments.length);
+	if(arguments.length == 1) {
+		api.getTotalMemSum('s',_first);		
+	} else {
+		api.getTotalMemSum(_first,_second);		
+	}
+}

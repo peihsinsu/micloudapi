@@ -1,0 +1,51 @@
+{
+  "name": "micloudapi",
+  "description": "MiCloud CloudAPI",
+  "version": "0.0.1",
+  "author": {
+    "name": "Simon Su",
+    "email": "simonsu@mitac.com.tw"
+  },
+  "contributors": [
+    {
+      "name": "Simon Su",
+      "email": "simonsu@mitac.com.tw"
+    }
+  ],
+  "dependencies": {
+    "smartdc": "6.5.3"
+  },
+  "devDependencies": {
+    "smartdc":"6.5.3"
+  },
+  "keywords": [
+    "MiCloud",
+    "Joyent",
+    "CloudAPI"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/peihsinsu/micloudapi"
+  },
+  "main": "index",
+  "bin": {
+    "mi-listmem": "./bin/mi-listmem"
+  },
+  "scripts": {
+    "test": "make test",
+    "prepublish": "npm prune"
+  },
+  "engines": {
+    "node": ">= 0.6.0 < 0.7.0"
+  },
+  "_id": "micloudapi@0.0.1",
+  "optionalDependencies": {},
+  "_engineSupported": true,
+  "_npmVersion": "1.1.9",
+  "_nodeVersion": "v0.6.13",
+  "_defaultsLoaded": true,
+  "dist": {
+    "shasum": "b51fc8cbf7c3a079013061d69ce20cc7fc83d90e"
+  },
+  "_from": "micloud"
+}
