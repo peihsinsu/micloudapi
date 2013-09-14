@@ -13,7 +13,7 @@
     }
   ],
   "dependencies": {
-    "smartdc": "6.5.3"
+    "smartdc": "*"
   },
   "devDependencies": {
     "smartdc":"6.5.3"
